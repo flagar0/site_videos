@@ -5,29 +5,36 @@ import youtube_dl
 def progresso(d):
     global tzao
     if(d['status'] == 'downloading'):
-        print(d['_percent_str'])
-        tzao.text(d['_percent_str'])
+        tzao.text(d['_percent_str'])#title
     if(d['status']=='finished'):
         file = open(d['filename'], 'rb')
-        st.download_button("Download file", file, file_name='video.mp4')
+        titulo = d['filename']
+        st.text('Video ' + titulo[0:len(titulo) - 4] + " baixado!")
+        st.download_button("Download Video", file, file_name=titulo)
+
+
 
 def baixa_video(url):
-    ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s.%(ext)s','progress_hooks': [progresso]})
+    ydl = youtube_dl.YoutubeDL({'outtmpl': '%(title)s.%(ext)s','progress_hooks': [progresso]})
 
     with ydl:
-        result = ydl.extract_info(
+        try:
+            result = ydl.extract_info(
             url,
             download=True  # We just want to extract the info
-        )
-    return result
+            )
+            return result
+        except Exception as erro:
+            error.warning('Link invalido', icon="⚠️")
+            print(erro)
 
-st.title('Flavin site')
+st.title('Youtube Video Donwloader')
 video=st.text_input('Url do video:',placeholder='https://www.youtube.com/watch?v=9hMmThJNZu0')
 tzao = st.empty()
+error = st.empty()
 if st.button('Baixar'):
-    print(video)
     if(video!=''):
         resultado = baixa_video(video)
 
-    else:
-        print("digita certo")
+    #else:
+       # st.warning('Link invalido', icon="⚠️")
