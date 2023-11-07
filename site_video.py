@@ -1,7 +1,7 @@
+import re
 import streamlit as st
-import json
-#streamlit run site_vid.py
-import yt_dlp
+from pytube import YouTube
+#streamlit run site_video.py
 
 if 'url_vid' not in st.session_state:
     st.session_state.url_vid = ''
@@ -17,25 +17,24 @@ def progresso(d):
         titulo = d['filename']
         st.text('Video ' + titulo[0:len(titulo) - 4] + " baixado!")
         st.download_button("Download Video", file, file_name=titulo)
-#TODO> adicionar caixinha com link para donwload
+#TODO> adicionar caixinha com link para download
 
+def baixar_video():
+    url = st.session_state.url_vid
+    yt = YouTube(url)
+    nomeArquivo = re.sub(r"[^a-zA-Z0-9_.-]", "", yt.title.replace(" ", "_"))
 
-def baixa_video():
-    url=st.session_state.url_vid
-    ydl = yt_dlp.YoutubeDL({'outtmpl': '%(title)s.%(ext)s','progress_hooks': [progresso]})
+    try:
+        yt.streams.get_highest_resolution().download(filename = "%s.mp4" % nomeArquivo)
+    except Exception as erro:
+        error.warning('Link invalido', icon="⚠️")
+        print(erro)
 
-    with ydl:
-        try:
-            ydl.download(url)
-        except Exception as erro:
-            error.warning('Link invalido', icon="⚠️")
-            print(erro)
+st.title('Youtube Video Downloader')
 
-st.title('Youtube Video Donwloader')
 #abre o css
 with open('estilo.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
 
 #Cria o form
 def cria_area(thumb,titulo):
@@ -44,22 +43,20 @@ def cria_area(thumb,titulo):
     confirma.markdown(f"""<p id="nome_vid">"""+titulo+"""</p>""",unsafe_allow_html=True)
     confirma.image(thumb,width=300)
 
-    confirma.button("Baixar",type='primary',key='baixar',on_click=baixa_video)
+    confirma.button("Baixar",type='primary',key='baixar',on_click=baixar_video)
 
 #cria  coluna
 col1, col2 = st.columns(2,gap='small')
-video=col1.text_input('Url do video:',placeholder='https://www.youtube.com/watch?v=9hMmThJNZu0',value='https://www.youtube.com/watch?v=9hMmThJNZu0')
+video = col1.text_input('Url do video:', placeholder='https://youtu.be/dQw4w9WgXcQ')
 if col2.button('Procurar',key='procurar'):
     if (video != ''):
-        with yt_dlp.YoutubeDL() as ydl:
-            info = ydl.extract_info(video, download=False)
+        yt = YouTube(video)
 
-            st.session_state.url_vid=video
-            cria_area(info['thumbnail'],info['title'])
+        st.session_state.url_vid = video
+        cria_area(yt.thumbnail_url, yt.title)
 
 
 tzao = st.empty()
 error = st.empty()
 baixado = st.empty()
 #TODO> creditos
-
