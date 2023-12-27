@@ -9,9 +9,12 @@ if 'url_vid' not in st.session_state:
 def progresso(d):
     if(d['status'] == 'downloading'):
         global tzao
-        tzao.text(d['_percent_str'])#title
-        st.progress(value)
-        #TODO> barra que sobe
+        zero=d['_percent_str'].find(' ')
+        porcento=d['_percent_str'].find('%')
+        tzao.text(float(d['_percent_str'][zero:porcento])/10)#title
+
+        baixado.progress(int(float(d['_percent_str'][zero:porcento])))
+
     if(d['status']=='finished'):
         file = open(d['filename'], 'rb')
         titulo = d['filename']
@@ -22,7 +25,7 @@ def progresso(d):
 
 def baixa_video():
     url=st.session_state.url_vid
-    ydl = yt_dlp.YoutubeDL({'outtmpl': '%(title)s.%(ext)s','progress_hooks': [progresso]})
+    ydl = yt_dlp.YoutubeDL({'outtmpl': '%(title)s.%(ext)s','progress_hooks': [progresso],'ratelimit':10000})
 
     with ydl:
         try:
@@ -48,7 +51,7 @@ def cria_area(thumb,titulo):
 
 #cria  coluna
 col1, col2 = st.columns(2,gap='small')
-video=col1.text_input('Url do video:',placeholder='https://www.youtube.com/watch?v=9hMmThJNZu0',value='https://www.youtube.com/watch?v=9hMmThJNZu0')
+video=col1.text_input('Url do video:',placeholder='https://www.youtube.com/watch?v=9hMmThJNZu0',value='https://www.youtube.com/watch?v=QL3EZwSJAh0')
 if col2.button('Procurar',key='procurar'):
     if (video != ''):
         with yt_dlp.YoutubeDL() as ydl:
