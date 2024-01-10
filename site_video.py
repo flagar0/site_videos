@@ -11,10 +11,12 @@ def progresso(d):
         global tzao
         zero=d['_percent_str'].find(' ')
         porcento=d['_percent_str'].find('%')
-        tzao.text(float(d['_percent_str'][zero:porcento])/10)#title
 
-        baixado.progress(int(float(d['_percent_str'][zero:porcento])))
-
+        try:
+            #tzao.text(float(d['_percent_str'][zero:porcento]))#title
+            baixado.progress(int(float(d['_percent_str'][zero:porcento])))
+        except:
+            baixado.progress(100)
     if(d['status']=='finished'):
         file = open(d['filename'], 'rb')
         titulo = d['filename']
@@ -25,16 +27,16 @@ def progresso(d):
 
 def baixa_video():
     url=st.session_state.url_vid
-    ydl = yt_dlp.YoutubeDL({'outtmpl': '%(title)s.%(ext)s','progress_hooks': [progresso],'ratelimit':10000})
+    ydl = yt_dlp.YoutubeDL({'outtmpl': '%(title)s.%(ext)s','progress_hooks': [progresso],'ratelimit':900000})
 
-    with ydl:
-        try:
-            ydl.download(url)
-        except Exception as erro:
-            error.warning('Link invalido', icon="⚠️")
-            print(erro)
+    try:
+        ydl.download(url)
+    except Exception as erro:
+        error.warning('Link invalido', icon="⚠️")
+        print(erro)
 
-st.title('Youtube Video Donwloader')
+st.title('Youtube Video Downloader')
+
 #abre o css
 with open('estilo.css') as f:
     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
