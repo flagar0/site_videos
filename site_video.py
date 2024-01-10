@@ -27,7 +27,7 @@ def progresso(d):
 
 def baixa_video():
     url=st.session_state.url_vid
-    ydl = yt_dlp.YoutubeDL({'outtmpl': '%(title)s.%(ext)s','progress_hooks': [progresso],'ratelimit':900000})
+    ydl = yt_dlp.YoutubeDL({'outtmpl': '%(title)s.'+extensao,'progress_hooks': [progresso],'ratelimit':900000})
 
     try:
         ydl.download(url)
@@ -62,7 +62,7 @@ if col2.button('Procurar',key='procurar'):
             st.session_state.url_vid=video
             cria_area(info['thumbnail'],info['title'])
 
-
+extensao = col2.selectbox("Extensão",('Mp4','Mp3'))
 tzao = st.empty()
 error = st.empty()
 baixado = st.empty()
